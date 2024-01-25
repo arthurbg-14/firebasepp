@@ -9,6 +9,8 @@
   "author": "ImpactIT",
   "license": "ISC",
   "dependencies": {
-    "firebase": "^10.7.2"
+    "firebase": "^10.7.2",
+    "tsc": "^2.0.4",
+    "typescript": "^5.3.3"
   }
 }
