@@ -9,7 +9,7 @@
   "author": "ImpactIT",
   "license": "ISC",
   "dependencies": {
-    "firebase": "^10.7.2",
+    "@angular/fire": "^17.0.1",
     "tsc": "^2.0.4",
     "typescript": "^5.3.3"
   }

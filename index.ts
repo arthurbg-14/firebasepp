@@ -1,4 +1,4 @@
-import { Query, DocumentData, getCountFromServer, getAggregateFromServer, sum } from 'firebase/firestore'
+import { Query, DocumentData, getCountFromServer, getAggregateFromServer, sum } from '@angular/fire/firestore'
 
 export const countQuery = <T, J extends DocumentData>(query: Query<T, J>) => 
     getCountFromServer(query).then(doc => doc.data().count)
