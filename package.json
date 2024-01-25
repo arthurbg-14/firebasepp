@@ -1,0 +1,14 @@
+{
+  "name": "firebasepp",
+  "version": "1.0.0",
+  "description": "Firebase Utils",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ImpactIT",
+  "license": "ISC",
+  "dependencies": {
+    "firebase": "^10.7.2"
+  }
+}
