@@ -1,14 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sumQueryField = exports.countQuery = void 0;
-var firestore_1 = require("@angular/fire/firestore");
-var countQuery = function (query) {
-    return (0, firestore_1.getCountFromServer)(query).then(function (doc) { return doc.data().count; });
-};
+exports.getRefField = exports.sumQueryField = exports.countQuery = void 0;
+const firestore_1 = require("@angular/fire/firestore");
+const countQuery = (query) => (0, firestore_1.getCountFromServer)(query).then(doc => doc.data().count);
 exports.countQuery = countQuery;
-var sumQueryField = function (field) {
-    return function (query) {
-        return (0, firestore_1.getAggregateFromServer)(query, { sum: (0, firestore_1.sum)(field) }).then(function (doc) { return doc.data().sum; });
-    };
-};
+const sumQueryField = (field) => (query) => (0, firestore_1.getAggregateFromServer)(query, { sum: (0, firestore_1.sum)(field) }).then(doc => doc.data().sum);
 exports.sumQueryField = sumQueryField;
+const getRefField = (doc_ref) => (field) => (0, firestore_1.getDoc)(doc_ref).then(doc => doc.get(field));
+exports.getRefField = getRefField;
