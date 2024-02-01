@@ -11,7 +11,8 @@
   "author": "ImpactIT",
   "license": "ISC",
   "dependencies": {
-    "@angular/fire": "^17.0.1"
+    "@angular/fire": "^17.0.1",
+    "rxjs": "^7.8.1"
   },
   "devDependencies": {
     "typescript": "^5.3.3"
