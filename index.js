@@ -1,6 +1,17 @@
 "use strict";
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.querySubstring = exports.observeQueryData = exports.getQueryData = exports.observeData = exports.getData = exports.observeRefField = exports.getRefField = exports.sumQueryField = exports.countQuery = void 0;
+exports.idConverter = exports.querySubstring = exports.observeQueryData = exports.getQueryData = exports.observeData = exports.getData = exports.observeRefField = exports.getRefField = exports.sumQueryField = exports.countQuery = void 0;
 const firestore_1 = require("@angular/fire/firestore");
 const rxjs_1 = require("rxjs");
 const countQuery = (query_ref) => (0, firestore_1.getCountFromServer)(query_ref).then(doc => doc.data().count);
@@ -21,3 +32,13 @@ const observeQueryData = (query_ref) => (0, firestore_1.collectionSnapshots)(que
 exports.observeQueryData = observeQueryData;
 const querySubstring = (query_ref) => (field) => (text) => (0, firestore_1.query)(query_ref, (0, firestore_1.where)(field, '>=', text), (0, firestore_1.where)(field, '<=', text + '\uf8ff'));
 exports.querySubstring = querySubstring;
+exports.idConverter = {
+    toFirestore(appModel) {
+        const { id } = appModel, rest = __rest(appModel, ["id"]);
+        return rest;
+    },
+    fromFirestore(snapshot) {
+        const data = snapshot.data();
+        return Object.assign(Object.assign({}, data), { id: snapshot.id });
+    }
+};
