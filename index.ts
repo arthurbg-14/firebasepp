@@ -1,4 +1,4 @@
-import { Query, DocumentData, getCountFromServer, getAggregateFromServer, sum, getDoc, FieldPath, DocumentReference, getDocs, query, where, docSnapshots, collectionSnapshots } from '@angular/fire/firestore'
+import { Query, DocumentData, getCountFromServer, getAggregateFromServer, sum, getDoc, FieldPath, DocumentReference, getDocs, query, where, docSnapshots, collectionSnapshots, QueryDocumentSnapshot } from '@angular/fire/firestore'
 import { map } from 'rxjs'
 
 export const countQuery = <M, DB extends DocumentData>(query_ref: Query<M, DB>) => 
@@ -28,3 +28,15 @@ export const observeQueryData = <M, DB extends DocumentData>(query_ref: Query<M,
 
 export const querySubstring = <M, DB extends DocumentData>(query_ref: Query<M, DB>) => 
     (field: string) => (text: string) => query(query_ref, where(field, '>=', text), where(field, '<=', text + '\uf8ff'))
+
+export const idConverter = {
+    toFirestore<A extends DocumentData & {id: string}>(appModel: A): Omit<A, 'id'> {
+        const {id, ...rest} = appModel
+        return rest
+    },
+    fromFirestore<A extends {id: string}>(snapshot: QueryDocumentSnapshot): A {
+      const data = snapshot.data()! as A
+      return {...data, id: snapshot.id}
+    }
+  };
+  
