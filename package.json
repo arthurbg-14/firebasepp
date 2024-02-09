@@ -1,6 +1,6 @@
 {
   "name": "firebasepp",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Firebase Utils",
   "main": "index.js",
   "scripts": {
