@@ -1,4 +1,4 @@
-import { Query, DocumentData, getCountFromServer, getAggregateFromServer, sum, getDoc, FieldPath, DocumentReference, getDocs, query, where, docSnapshots, collectionSnapshots, QueryDocumentSnapshot } from '@angular/fire/firestore'
+import { Query, DocumentData, getCountFromServer, getAggregateFromServer, sum, getDoc, FieldPath, DocumentReference, getDocs, query, where, docSnapshots, collectionSnapshots, QueryDocumentSnapshot, documentId } from '@angular/fire/firestore'
 import { map } from 'rxjs'
 
 export const countQuery = <M, DB extends DocumentData>(query_ref: Query<M, DB>) => 
@@ -39,4 +39,18 @@ export const idConverter = {
       return {...data, id: snapshot.id}
     }
   };
+
+const chunkfy = <T>(arr: T[], size: number) =>
+  Array.from({ length: Math.ceil(arr.length / size) }, (v, i) =>
+    arr.slice(i * size, i * size + size)
+  );
+
+export const getDocsByIds= async <M, DB extends DocumentData>(query_ref: Query<M, DB>, ids: string[]) => { const chunks = chunkfy(ids, 30)
+  const queries = chunks.map(chunk => getDocs(query(query_ref, where(documentId(), 'in', chunk))))
+  return Promise.all(queries)
+}
   
+export const getDocsDataByIds= async <M, DB extends DocumentData>(query_ref: Query<M, DB>, ids: string[]) => 
+  getDocsByIds(query_ref, ids).then(queries => 
+    queries.map(query => query.docs.map(doc => doc.data())).flat())
+

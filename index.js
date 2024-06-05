@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __rest = (this && this.__rest) || function (s, e) {
     var t = {};
     for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
@@ -11,7 +20,7 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.idConverter = exports.querySubstring = exports.observeQueryData = exports.getQueryData = exports.observeData = exports.getData = exports.observeRefField = exports.getRefField = exports.sumQueryField = exports.countQuery = void 0;
+exports.getDocsDataByIds = exports.getDocsByIds = exports.idConverter = exports.querySubstring = exports.observeQueryData = exports.getQueryData = exports.observeData = exports.getData = exports.observeRefField = exports.getRefField = exports.sumQueryField = exports.countQuery = void 0;
 const firestore_1 = require("@angular/fire/firestore");
 const rxjs_1 = require("rxjs");
 const countQuery = (query_ref) => (0, firestore_1.getCountFromServer)(query_ref).then(doc => doc.data().count);
@@ -42,3 +51,14 @@ exports.idConverter = {
         return Object.assign(Object.assign({}, data), { id: snapshot.id });
     }
 };
+const chunkfy = (arr, size) => Array.from({ length: Math.ceil(arr.length / size) }, (v, i) => arr.slice(i * size, i * size + size));
+const getDocsByIds = (query_ref, ids) => __awaiter(void 0, void 0, void 0, function* () {
+    const chunks = chunkfy(ids, 30);
+    const queries = chunks.map(chunk => (0, firestore_1.getDocs)((0, firestore_1.query)(query_ref, (0, firestore_1.where)((0, firestore_1.documentId)(), 'in', chunk))));
+    return Promise.all(queries);
+});
+exports.getDocsByIds = getDocsByIds;
+const getDocsDataByIds = (query_ref, ids) => __awaiter(void 0, void 0, void 0, function* () {
+    return (0, exports.getDocsByIds)(query_ref, ids).then(queries => queries.map(query => query.docs.map(doc => doc.data())).flat());
+});
+exports.getDocsDataByIds = getDocsDataByIds;
