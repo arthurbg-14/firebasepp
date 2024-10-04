@@ -20,7 +20,7 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDocsDataByIds = exports.getDocsByIds = exports.idConverter = exports.querySubstring = exports.observeQueryData = exports.getQueryData = exports.observeData = exports.getData = exports.observeRefField = exports.getRefField = exports.sumQueryField = exports.countQuery = void 0;
+exports.injectCollectionWithId = exports.injectCollection = exports.getDocsDataByIds = exports.getDocsByIds = exports.idConverter = exports.querySubstring = exports.observeQueryData = exports.getQueryData = exports.observeData = exports.getData = exports.observeRefField = exports.getRefField = exports.sumQueryField = exports.countQuery = void 0;
 const firestore_1 = require("@angular/fire/firestore");
 const rxjs_1 = require("rxjs");
 const countQuery = (query_ref) => (0, firestore_1.getCountFromServer)(query_ref).then(doc => doc.data().count);
@@ -41,7 +41,7 @@ const observeQueryData = (query_ref) => (0, firestore_1.collectionSnapshots)(que
 exports.observeQueryData = observeQueryData;
 const querySubstring = (query_ref) => (field) => (text) => (0, firestore_1.query)(query_ref, (0, firestore_1.where)(field, '>=', text), (0, firestore_1.where)(field, '<=', text + '\uf8ff'));
 exports.querySubstring = querySubstring;
-exports.idConverter = {
+const idConverter = () => ({
     toFirestore(appModel) {
         const { id } = appModel, rest = __rest(appModel, ["id"]);
         return rest;
@@ -50,7 +50,8 @@ exports.idConverter = {
         const data = snapshot.data();
         return Object.assign(Object.assign({}, data), { id: snapshot.id });
     }
-};
+});
+exports.idConverter = idConverter;
 const chunkfy = (arr, size) => Array.from({ length: Math.ceil(arr.length / size) }, (v, i) => arr.slice(i * size, i * size + size));
 const getDocsByIds = (query_ref, ids) => __awaiter(void 0, void 0, void 0, function* () {
     const chunks = chunkfy(ids, 30);
@@ -62,3 +63,7 @@ const getDocsDataByIds = (query_ref, ids) => __awaiter(void 0, void 0, void 0, f
     return (0, exports.getDocsByIds)(query_ref, ids).then(queries => queries.map(query => query.docs.map(doc => doc.data())).flat());
 });
 exports.getDocsDataByIds = getDocsDataByIds;
+const injectCollection = (path) => (0, firestore_1.collection)((0, firestore_1.getFirestore)(), path);
+exports.injectCollection = injectCollection;
+const injectCollectionWithId = (path) => (0, exports.injectCollection)(path).withConverter((0, exports.idConverter)());
+exports.injectCollectionWithId = injectCollectionWithId;

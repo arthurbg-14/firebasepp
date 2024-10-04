@@ -1,4 +1,4 @@
-import { Query, DocumentData, getCountFromServer, getAggregateFromServer, sum, getDoc, FieldPath, DocumentReference, getDocs, query, where, docSnapshots, collectionSnapshots, QueryDocumentSnapshot, documentId } from '@angular/fire/firestore'
+import { Query, DocumentData, getCountFromServer, getAggregateFromServer, sum, getDoc, FieldPath, DocumentReference, getDocs, query, where, docSnapshots, collectionSnapshots, QueryDocumentSnapshot, documentId, collection, CollectionReference, getFirestore } from '@angular/fire/firestore'
 import { map } from 'rxjs'
 
 export const countQuery = <M, DB extends DocumentData>(query_ref: Query<M, DB>) => 
@@ -29,16 +29,16 @@ export const observeQueryData = <M, DB extends DocumentData>(query_ref: Query<M,
 export const querySubstring = <M, DB extends DocumentData>(query_ref: Query<M, DB>) => 
     (field: string) => (text: string) => query(query_ref, where(field, '>=', text), where(field, '<=', text + '\uf8ff'))
 
-export const idConverter = {
-    toFirestore<A extends DocumentData & {id: string}>(appModel: A): Omit<A, 'id'> {
+export const idConverter = <A>() => ({
+    toFirestore(appModel:  A & {id: string}): Omit<A, 'id'> {
         const {id, ...rest} = appModel
         return rest
     },
-    fromFirestore<A>(snapshot: QueryDocumentSnapshot): A & {id: string} {
+    fromFirestore(snapshot: QueryDocumentSnapshot): A & {id: string} {
       const data = snapshot.data()! as A
       return {...data, id: snapshot.id}
     }
-  };
+  });
 
 const chunkfy = <T>(arr: T[], size: number) =>
   Array.from({ length: Math.ceil(arr.length / size) }, (v, i) =>
@@ -54,3 +54,5 @@ export const getDocsDataByIds= async <M, DB extends DocumentData>(query_ref: Que
   getDocsByIds(query_ref, ids).then(queries => 
     queries.map(query => query.docs.map(doc => doc.data())).flat())
 
+export const injectCollection = <Model>(path: string) => collection(getFirestore(), path) as CollectionReference<Model, DocumentData>
+export const injectCollectionWithId = <Model>(path: string) => injectCollection<Model>(path).withConverter(idConverter<Model>())
