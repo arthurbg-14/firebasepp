@@ -34,7 +34,7 @@ export const idConverter = {
         const {id, ...rest} = appModel
         return rest
     },
-    fromFirestore<A extends {id: string}>(snapshot: QueryDocumentSnapshot): A {
+    fromFirestore<A>(snapshot: QueryDocumentSnapshot): A & {id: string} {
       const data = snapshot.data()! as A
       return {...data, id: snapshot.id}
     }
