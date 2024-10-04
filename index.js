@@ -20,7 +20,7 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.injectCollectionWithId = exports.injectCollection = exports.getDocsDataByIds = exports.getDocsByIds = exports.idConverter = exports.querySubstring = exports.observeQueryData = exports.getQueryData = exports.observeData = exports.getData = exports.observeRefField = exports.getRefField = exports.sumQueryField = exports.countQuery = void 0;
+exports.injectCollectionWithId = exports.injectCollection = exports.getDocsDataByIdsUnique = exports.getDocsByIdsUnique = exports.getDocsDataByIds = exports.getDocsByIds = exports.idConverter = exports.querySubstring = exports.observeQueryData = exports.getQueryData = exports.observeData = exports.getData = exports.observeRefField = exports.getRefField = exports.sumQueryField = exports.countQuery = void 0;
 const firestore_1 = require("@angular/fire/firestore");
 const rxjs_1 = require("rxjs");
 const countQuery = (query_ref) => (0, firestore_1.getCountFromServer)(query_ref).then(doc => doc.data().count);
@@ -53,16 +53,18 @@ const idConverter = () => ({
 });
 exports.idConverter = idConverter;
 const chunkfy = (arr, size) => Array.from({ length: Math.ceil(arr.length / size) }, (v, i) => arr.slice(i * size, i * size + size));
-const getDocsByIds = (query_ref, ids) => __awaiter(void 0, void 0, void 0, function* () {
-    const chunks = chunkfy(ids, 30);
-    const queries = chunks.map(chunk => (0, firestore_1.getDocs)((0, firestore_1.query)(query_ref, (0, firestore_1.where)((0, firestore_1.documentId)(), 'in', chunk))));
-    return Promise.all(queries);
-});
+const getDocsByIds = (query_ref) => (ids) => Promise.all(chunkfy(ids, 30).map(chunk => (0, firestore_1.getDocs)((0, firestore_1.query)(query_ref, (0, firestore_1.where)((0, firestore_1.documentId)(), 'in', chunk)))));
 exports.getDocsByIds = getDocsByIds;
-const getDocsDataByIds = (query_ref, ids) => __awaiter(void 0, void 0, void 0, function* () {
-    return (0, exports.getDocsByIds)(query_ref, ids).then(queries => queries.map(query => query.docs.map(doc => doc.data())).flat());
-});
+const getDocsDataByIds = (query_ref) => (ids) => (0, exports.getDocsByIds)(query_ref)(ids).then(queries => queries.map(query => query.docs.map(doc => doc.data())).flat());
 exports.getDocsDataByIds = getDocsDataByIds;
+const getDocsByIdsUnique = (query_ref) => __awaiter(void 0, void 0, void 0, function* () {
+    return (ids) => (0, exports.getDocsDataByIds)(query_ref)([...new Set(ids)]);
+});
+exports.getDocsByIdsUnique = getDocsByIdsUnique;
+const getDocsDataByIdsUnique = (query_ref) => __awaiter(void 0, void 0, void 0, function* () {
+    return (ids) => (0, exports.getDocsDataByIds)(query_ref)([...new Set(ids)]);
+});
+exports.getDocsDataByIdsUnique = getDocsDataByIdsUnique;
 const injectCollection = (path) => (0, firestore_1.collection)((0, firestore_1.getFirestore)(), path);
 exports.injectCollection = injectCollection;
 const injectCollectionWithId = (path) => (0, exports.injectCollection)(path).withConverter((0, exports.idConverter)());
